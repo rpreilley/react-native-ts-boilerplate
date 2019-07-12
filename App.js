@@ -1,6 +1,5 @@
 import { Constants, Camera, FileSystem, Permissions, BarCodeScanner } from 'expo';
 import React from 'react';
-import { Video } from 'expo-av';
 import {
   Alert,
   StyleSheet,
@@ -85,7 +84,21 @@ export default class CameraScreen extends React.Component {
   }
 
   componentDidMount() {
+    // Uncomment the two deleteAsync blocks below to delete the cache from the file system
+    
+    // FileSystem.deleteAsync(FileSystem.documentDirectory + 'photos').catch(e => {
+    //   console.log(e, 'Photos directory could not be deleted');
+    // })
+
+    // FileSystem.deleteAsync(FileSystem.documentDirectory + 'videos').catch(e => {
+    //   console.log(e, 'Videos directory could not be deleted');
+    // })
+
     FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'photos').catch(e => {
+      console.log(e, 'Directory exists');
+    });
+
+    FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'videos').catch(e => {
       console.log(e, 'Directory exists');
     });
   }
@@ -126,9 +139,8 @@ export default class CameraScreen extends React.Component {
   };
 
   takeVideo = () => {
-    let self = this;
     if (this.camera) {
-      const uri = this.camera.recordAsync({ onPictureSaved: this.onPictureSaved, maxDuration: 10 })
+      this.camera.recordAsync({ maxDuration: 10 }).then(data => this.onVideoSaved(data));
     }
   }
 
@@ -138,6 +150,14 @@ export default class CameraScreen extends React.Component {
     await FileSystem.moveAsync({
       from: photo.uri,
       to: `${FileSystem.documentDirectory}photos/${Date.now()}.jpg`,
+    });
+    this.setState({ newPhotos: true });
+  }
+
+  onVideoSaved = async video => {
+    await FileSystem.moveAsync({
+      from: video.uri,
+      to: `${FileSystem.documentDirectory}videos/${Date.now()}.mp4`,
     });
     this.setState({ newPhotos: true });
   }
@@ -286,7 +306,7 @@ export default class CameraScreen extends React.Component {
             this.setState({ cameraIsRecording: false, bcolor: 'white'})
             this.camera.stopRecording();
           } else {
-            console.log("Camera stopped recording video")
+            console.log("Camera started recording video")
             this.setState({ cameraIsRecording: true, bcolor: 'red'})
             this.takeVideo();
           }
