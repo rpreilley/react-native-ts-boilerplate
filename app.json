@@ -27,7 +27,7 @@
       "supportsTablet": true,
       "config": {
         "googleMaps": {
-          "apiKey": "test"
+          "apiKey": "<Your API Key here>"
         }
       }
     }
