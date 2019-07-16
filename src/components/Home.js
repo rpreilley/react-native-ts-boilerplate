@@ -20,6 +20,7 @@ export default class Home extends React.Component {
   }
 
   takeAction(index) {
+    // Grab index and perform action. Will set as ENUM
     let indexSelected = index;
     switch(indexSelected) {
       case 0:
