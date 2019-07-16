@@ -14,7 +14,7 @@ export default class GalleryView extends React.Component {
     images: {},
     photos: [],
     videos: [],
-    selected: [],
+    selected: []
   };
 
   componentDidMount = async () => {
@@ -37,38 +37,30 @@ export default class GalleryView extends React.Component {
     const photos = this.state.selected;
     const videos = this.state.selected;
 
-    if (photos.length > 0) {
+    if (photos.length > 0 || videos.length) {
       const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
 
       if (status !== 'granted') {
         throw new Error('Denied CAMERA_ROLL permissions!');
       }
 
-      const promises = photos.map(photoUri => {
-        return MediaLibrary.createAssetAsync(photoUri);
-      });
+      if (photos.length > 0) {
+        const photoPromises = photos.map(photoUri => {
+          return MediaLibrary.createAssetAsync(photoUri);
+        });
+      }
 
-      await Promise.all(promises);
-      alert('Successfully saved photos to user\'s gallery!');
+      if (videos.length > 0) {
+        const videoPromises = videos.map(videoUri => {
+          return MediaLibrary.createAssetAsync(videoUri);
+        });
+      }
+
+      await Promise.all(photoPromises);
+      await Promise.all(videoPromises);
+      alert('Successfully saved to user\'s gallery!');
     } else {
       alert('No photos to save!');
-    }
-
-    if (videos.length > 0) {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
-      if (status !== 'granted') {
-        throw new Error('Denied CAMERA_ROLL permissions!');
-      }
-
-      const promises = videos.map(videoUri => {
-        return MediaLibrary.createAssetAsync(videoUri);
-      });
-
-      await Promise.all(promises);
-      alert('Successfully saved videos to user\'s gallery!');
-    } else {
-      alert('No videos to save!');
     }
   };
 
@@ -100,8 +92,6 @@ export default class GalleryView extends React.Component {
         <ScrollView contentComponentStyle={{ flex: 1 }}>
           <View style={styles.pictures}>
             {this.state.photos.map(this.renderPhoto)}
-          </View>
-          <View style={styles.videos}>
             {this.state.videos.map(this.renderVideo)}
           </View>
         </ScrollView>

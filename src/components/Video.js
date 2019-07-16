@@ -6,7 +6,7 @@ import { Video } from 'expo';
 
 const pictureSize = 150;
 
-export default class VideoComponent extends React.Component {
+export default class VideoScreen extends React.Component {
   state = {
     selected: false,
     faces: [],
