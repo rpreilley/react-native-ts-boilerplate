@@ -14,11 +14,6 @@ export default class Home extends React.Component {
     }
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   takeAction(index) {
     // Grab index and perform action. Will set as ENUM
     let indexSelected = index;
@@ -64,10 +59,9 @@ export default class Home extends React.Component {
                 {
                   options: BUTTONS,
                   cancelButtonIndex: CANCEL_INDEX,
-                  title: 'Clear cache options'
+                  title: 'Clear Cache Options'
                 },
                 buttonIndex => {
-                  this.setState({clicked: BUTTONS[buttonIndex]})
                   this.takeAction(buttonIndex)
                 }
               )}

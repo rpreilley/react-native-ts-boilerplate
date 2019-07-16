@@ -34,34 +34,25 @@ export default class GalleryView extends React.Component {
   };
 
   saveToGallery = async () => {
-    const photos = this.state.selected;
-    const videos = this.state.selected;
+    const selectedThumbnails = this.state.selected;
 
-    if (photos.length > 0 || videos.length) {
+    if (selectedThumbnails.length > 0) {
       const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
 
       if (status !== 'granted') {
         throw new Error('Denied CAMERA_ROLL permissions!');
       }
 
-      if (photos.length > 0) {
-        const photoPromises = photos.map(photoUri => {
-          return MediaLibrary.createAssetAsync(photoUri);
-        });
-      }
+      const promises = selectedThumbnails.map(photoUri => {
+        return MediaLibrary.createAssetAsync(photoUri);
+      });
 
-      if (videos.length > 0) {
-        const videoPromises = videos.map(videoUri => {
-          return MediaLibrary.createAssetAsync(videoUri);
-        });
-      }
-
-      await Promise.all(photoPromises);
-      await Promise.all(videoPromises);
+      await Promise.all(promises);
       alert('Successfully saved to user\'s gallery!');
     } else {
       alert('No photos to save!');
     }
+
   };
 
   renderPhoto = fileName => 
