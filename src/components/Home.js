@@ -38,7 +38,6 @@ export default class Home extends React.Component {
 
   render() {
 
-    const imageUri = 'https://facebook.github.io/react-native/docs/assets/favicon.png';
     let BUTTONS = ['Clear Photo Cache', 'Clear Video Cache', 'Cancel'];
     let CANCEL_INDEX = 3;
 
@@ -46,9 +45,6 @@ export default class Home extends React.Component {
       <Container>
         {/* <Header /> */}
         <Content padder contentContainerStyle={styles.contentContainer}>
-          <View style={styles.thumbnail}>
-            <Thumbnail large source={{uri: imageUri}} />
-          </View>
           <Text>
             This is a react native demonstration, utilizing Expo's camera and geolocation APIs.
           </Text>
@@ -98,11 +94,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
-  },
-  thumbnail: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 15
   },
   clearCacheButton: {
     marginTop: 15
