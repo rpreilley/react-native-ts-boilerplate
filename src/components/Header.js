@@ -11,9 +11,7 @@ export default class HeaderNoLeft extends Component {
   }
 
   componentDidMount() {
-    console.log("OLD", this.props.showBackButton)
     this.setState({showBackButton: this.props.showBackButton})
-    console.log("NEW", this.props.showBackButton)
   }
 
   render() {
@@ -21,7 +19,7 @@ export default class HeaderNoLeft extends Component {
     return (
       <Header style={styles.header}>
         <Left>
-          <Button transparent onPress={() => this.props.toggleDrawer()}>
+          <Button transparent onPress={() => this.props.navigation.toggleDrawer()}>
             <Icon name='menu' style={styles.headerButtons} />
           </Button>
         </Left>
@@ -31,8 +29,7 @@ export default class HeaderNoLeft extends Component {
         <Right>
           { this.state.showBackButton 
             ? 
-            
-              <Button transparent onPress={ () => this.props.goBack() }>
+              <Button transparent onPress={ () => this.props.navigation.goBack() }>
                 <Icon name='arrow-back' style={styles.headerButtons} />
                 <Text style={styles.headerText}>Back</Text>
               </Button>

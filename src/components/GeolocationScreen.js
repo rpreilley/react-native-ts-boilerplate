@@ -1,7 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { MapView, Location, Permissions } from "expo";
-import { Container, Content } from 'native-base'; 
+import { Container, Content, Button, Text, Card, CardItem, Body, Spinner  } from 'native-base'; 
+import Header from './Header';
+import Footer from './Footer';
 
 export default class GeolocationScreen extends React.Component {
 
@@ -11,6 +13,9 @@ export default class GeolocationScreen extends React.Component {
       isLoading: true,
       permissionsGranted: false,
       currentLocation: [],
+      nearbyRestaurants: [],
+      currentLat: null,
+      currentLon: null,
       brLatitude: 30.447407,
       brLongitude: -91.181549
     }
@@ -22,21 +27,34 @@ export default class GeolocationScreen extends React.Component {
   }
 
   componentDidMount() {
-    //this.fetchCurrentLocation();
+    this.fetchCurrentLocation();
   }
 
   fetchCurrentLocation() {
     Location.getCurrentPositionAsync()
       .then((response) => {
-        console.log("RESPONSE :", response)
+        console.log(response)
         this.setState({
           isLoading: false,
-          currentLocation: [response]
+          currentLocation: [response],
+          currentLat: response.coords.latitude,
+          currentLon: response.coords.longitude
         })
       })
       .catch((error) => {
         console.log(error);
       })
+  }
+
+  fetchNearbyRestaurants() {
+    fetch(`https://developers.zomato.com/api/v2.1/geocode?lat=${this.state.currentLat}&lon=${this.state.currentLon}`)
+      .then(function(response) {
+        console.log("RESPONSE: ", response)
+        return response.json();
+      })
+      .then(function(myJson) {
+        console.log(JSON.stringify(myJson));
+      });
   }
 
   fetchRegionForCoordinates(lat, lon, distance) {
@@ -54,11 +72,12 @@ export default class GeolocationScreen extends React.Component {
   }
 
   render() {
+    const navigationProps = this.props;
 
     const LATITUDE = this.state.brLatitude; // Baton Rouge, LA
     const LONGITUDE = this.state.brLongitude; // Baton Rouge, LA
 
-    let response = this.fetchRegionForCoordinates(LATITUDE, LONGITUDE, 12000);
+    let response = this.fetchRegionForCoordinates(LATITUDE, LONGITUDE, 5000);
     
     // Set deltas based on response
     const LATITUDE_DELTA = response.latitudeDelta
@@ -66,7 +85,40 @@ export default class GeolocationScreen extends React.Component {
     
     return (
       <Container>
-        <Content padder contentContainerStyle={styles.contentContainer}>
+        <Header showBackButton={true} {...navigationProps} />
+        <Content contentContainerStyle={styles.contentContainer}>
+          <View style={styles.topContent}>
+            { this.state.currentLat && this.state.currentLon ?
+            <Card>
+              <CardItem>
+                <Text>
+                  {`Current Latitude: ${this.state.currentLat}`}
+                </Text> 
+              </CardItem>
+              <CardItem>
+                <Text>
+                  {`Current Longitude: ${this.state.currentLon}`}
+                </Text> 
+              </CardItem>
+              <CardItem style={{justifyContent: 'center'}}>
+                <Button onPress={() => this.fetchNearbyRestaurants}>
+                  <Text>
+                    Mark Nearby Restaurants
+                  </Text>
+                </Button>
+                { this.state.nearbyRestaurants.length > 0 ?
+                <Button>
+                  <Text>
+                    Clear Restaurants Markers
+                  </Text>
+                </Button>
+                : null
+                }
+              </CardItem>
+            </Card> : 
+            <Spinner color='#039be5' /> }
+          </View>
+          {}
           <MapView
               style={styles.mapView}
               region={{
@@ -105,6 +157,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  topContent: {
+    marginBottom: 10
   },
   mapView: {
     height: 500,

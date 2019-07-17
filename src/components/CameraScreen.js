@@ -20,6 +20,7 @@ import {
   Octicons
 } from '@expo/vector-icons';
 import Header from './Header';
+import Footer from './Footer';
 
 const landmarkSize = 2;
 
@@ -78,8 +79,7 @@ export default class CameraScreen extends React.Component {
       showMoreOptions: false,
       cameraIsRecording: false,
       bcolor: 'white',
-      recordingIcon: 'ios-radio-button-on',
-      headerProps: this.props.navigation
+      recordingIcon: 'ios-radio-button-on'
     };
   }  
 
@@ -355,14 +355,15 @@ export default class CameraScreen extends React.Component {
     );
 
   render() {
-    const headerProps = this.state.headerProps;
+    const navigationProps = this.props;
+
     const cameraScreenContent = this.state.permissionsGranted
       ? this.renderCamera()
       : this.renderNoPermissions();
     const content = this.state.showGallery ? this.renderGallery() : cameraScreenContent;
     return (
       <Container>
-        <Header showBackButton={true} {...headerProps}/>
+        <Header showBackButton={true} {...navigationProps}/>
         <View style={styles.content}>{content}</View>
       </Container>
     )

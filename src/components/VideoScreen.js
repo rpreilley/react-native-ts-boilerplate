@@ -20,6 +20,7 @@ import {
   Octicons
 } from '@expo/vector-icons';
 import Header from './Header';
+import Footer from './Footer';
 
 const landmarkSize = 2;
 
@@ -77,8 +78,7 @@ export default class VideoScreen extends React.Component {
     showMoreOptions: false,
     cameraIsRecording: false,
     bcolor: 'white',
-    recordingIcon: 'ios-videocam',
-    headerProps: this.props.navigation
+    recordingIcon: 'ios-videocam'
   };
 
   async componentWillMount() {
@@ -363,14 +363,14 @@ export default class VideoScreen extends React.Component {
     );
 
   render() {
-    const headerProps = this.props.navigation;
+    const navigationProps = this.props;
     const cameraScreenContent = this.state.permissionsGranted
       ? this.renderCamera()
       : this.renderNoPermissions();
     const content = this.state.showGallery ? this.renderGallery() : cameraScreenContent;
     return (
       <Container>
-        <Header {...headerProps}/>
+        <Header showBackButton={true} {...navigationProps} />
         <View style={styles.content}>{content}</View>
       </Container>
     )
