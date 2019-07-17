@@ -1,17 +1,19 @@
 import React from 'react';
-import { createStackNavigator, createAppContainer } from 'react-navigation';
+import { createDrawerNavigator, createAppContainer } from 'react-navigation';
 import CameraScreen from './src/components/CameraScreen';
 import VideoScreen from './src/components/VideoScreen';
 import GeolocationScreen from './src/components/GeolocationScreen';
+import AppOptionsScreen from './src/components/AppOptionsScreen';
 import Home from './src/components/Home';
 import { Root } from 'native-base';
 
-const AppNavigator = createStackNavigator(
+const AppDrawerNavigator = createDrawerNavigator(
   {
     Home: Home,
-    CameraScreen: CameraScreen,
-    VideoScreen: VideoScreen,
-    GeolocationScreen: GeolocationScreen
+    Camera: CameraScreen,
+    Video: VideoScreen,
+    Geolocation: GeolocationScreen,
+    Settings: AppOptionsScreen
   },
   {
     initialRouteName: 'Home',
@@ -21,12 +23,15 @@ const AppNavigator = createStackNavigator(
         fontWeight: 'bold',
         color: 'black'
       }
-    }
+    },
+    contentOptions: {
+      activeTintColor: '#e91e63',
+    },
   }
 )
 
 // export default createAppContainer(AppNavigator);
-const AppContainer = createAppContainer(AppNavigator);
+const AppContainer = createAppContainer(AppDrawerNavigator);
 
 export default class App extends React.Component {
   static nagivationOptions = {

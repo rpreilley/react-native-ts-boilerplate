@@ -1,84 +1,35 @@
-import { FileSystem } from 'expo';
 import React from 'react';
 import {
-  StyleSheet,
-  View
+  StyleSheet
 } from 'react-native';
-import { Container, Content, Footer, FooterTab, Button, Icon, Text, Thumbnail, ActionSheet } from 'native-base';
+import { Container, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
 import Header from './Header';
 
 export default class Home extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      headerTitle: 'Home'
-    }
-  }
-
-  takeAction(index) {
-    // Grab index and perform action. Will set as ENUM
-    let indexSelected = index;
-    switch(indexSelected) {
-      case 0:
-        FileSystem.deleteAsync(FileSystem.documentDirectory + 'photos').catch(e => {
-          console.log(e, 'Photos directory could not be deleted');
-        })
-        break;
-      case 1:
-        FileSystem.deleteAsync(FileSystem.documentDirectory + 'videos').catch(e => {
-          console.log(e, 'Videos directory could not be deleted');
-        })
-        break;
-      case 1:
-        // Do nothing, has been cancelled
-        break;
-      default:
-        // code block
-    }
-  }
 
   render() {
 
-    let BUTTONS = ['Clear Photo Cache', 'Clear Video Cache', 'Cancel'];
-    let CANCEL_INDEX = 3;
+    let headerProps = this.props.navigation;
 
     return (
       <Container>
-        {/* <Header /> */}
+        <Header {...headerProps}/>
         <Content padder contentContainerStyle={styles.contentContainer}>
           <Text>
             This is a react native demonstration, utilizing Expo's camera and geolocation APIs.
           </Text>
-          <View style={styles.clearCacheButton}>
-            <Button
-              onPress={() =>
-              ActionSheet.show(
-                {
-                  options: BUTTONS,
-                  cancelButtonIndex: CANCEL_INDEX,
-                  title: 'Clear Cache Options'
-                },
-                buttonIndex => {
-                  this.takeAction(buttonIndex)
-                }
-              )}
-            >
-              <Text>
-                Clear cache
-              </Text>
-            </Button>
-          </View>
         </Content>
         <Footer>
           <FooterTab>
-            <Button vertical onPress={() => this.props.navigation.navigate('CameraScreen')}>
+            <Button vertical onPress={() => this.props.navigation.navigate('Camera')}>
               <Icon name="camera" />
               <Text>Camera</Text>
             </Button>
-            <Button vertical onPress={() => this.props.navigation.navigate('VideoScreen')}>
+            <Button vertical onPress={() => this.props.navigation.navigate('Video')}>
               <Icon name="videocam" />
               <Text>Video</Text>
             </Button>
-            <Button vertical onPress={() => this.props.navigation.navigate('GeolocationScreen')}>
+            <Button vertical onPress={() => this.props.navigation.navigate('Geolocation')}>
               <Icon active name="pin" />
               <Text>Geolocation</Text>
             </Button>
@@ -96,6 +47,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   clearCacheButton: {
-    marginTop: 15
+    padding: 10,
+    position: 'absolute',
+    top: 0,
+    left: 0
   }
 });

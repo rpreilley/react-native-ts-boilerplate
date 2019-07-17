@@ -1,10 +1,7 @@
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Text
-} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { MapView, Location, Permissions } from "expo";
+import { Container, Content } from 'native-base'; 
 
 export default class GeolocationScreen extends React.Component {
 
@@ -13,13 +10,9 @@ export default class GeolocationScreen extends React.Component {
     this.state = {
       isLoading: true,
       permissionsGranted: false,
-      markers: []
-    }
-  }
-
-  static navigationOptions = ({ navigation }) => {
-    return {
-      headerTitle: 'Map View'
+      currentLocation: [],
+      brLatitude: 30.447407,
+      brLongitude: -91.181549
     }
   }
 
@@ -29,53 +22,80 @@ export default class GeolocationScreen extends React.Component {
   }
 
   componentDidMount() {
-    //this.fetchMarkerData();
+    //this.fetchCurrentLocation();
   }
 
-  fetchMarkerData() {
-    fetch('https://feeds.citibikenyc.com/stations/stations.json')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        this.setState({ 
+  fetchCurrentLocation() {
+    Location.getCurrentPositionAsync()
+      .then((response) => {
+        console.log("RESPONSE :", response)
+        this.setState({
           isLoading: false,
-          markers: responseJson.stationBeanList, 
-        });
+          currentLocation: [response]
+        })
       })
       .catch((error) => {
         console.log(error);
-      });
+      })
+  }
+
+  fetchRegionForCoordinates(lat, lon, distance) {
+    const oneDegreeOfLatitudeInMeters = 111.32 * 1000;
+
+       const latitudeDelta =distance / oneDegreeOfLatitudeInMeters;
+       const longitudeDelta = distance / (oneDegreeOfLatitudeInMeters * Math.cos(lat * (Math.PI / 180)));
+
+       return result = {
+           latitude: lat,
+           longitude: lon,
+           latitudeDelta,
+           longitudeDelta,
+       }
   }
 
   render() {
+
+    const LATITUDE = this.state.brLatitude; // Baton Rouge, LA
+    const LONGITUDE = this.state.brLongitude; // Baton Rouge, LA
+
+    let response = this.fetchRegionForCoordinates(LATITUDE, LONGITUDE, 12000);
+    
+    // Set deltas based on response
+    const LATITUDE_DELTA = response.latitudeDelta
+    const LONGITUDE_DELTA = response.longitudeDelta
     
     return (
-      <MapView
-          style={{ flex: 1 }}
-          region={{
-            latitude: 40.76727216,
-            longitude: -73.99392888,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-      >
-        {this.state.isLoading ? null : this.state.markers.map((marker, index) => {
-          const markerCoords = {
-              latitude: marker.latitude,
-              longitude: marker.longitude,
-          };
+      <Container>
+        <Content padder contentContainerStyle={styles.contentContainer}>
+          <MapView
+              style={styles.mapView}
+              region={{
+                latitude: LATITUDE,
+                longitude: LONGITUDE,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA
+              }}
+          >
+            {this.state.isLoading ? null : this.state.currentLocation.map((marker, index) => {
 
-          const metaData = `Status: ${marker.statusValue}`;
+              const markerCoords = {
+                latitude: marker.coords.latitude,
+                longitude: marker.coords.longitude,
+              };
 
-          return (
-              <MapView.Marker
-                  key={index}
-                  coordinate={markerCoords}
-                  title={marker.stationName}
-                  description={metaData}
-              />
-          );
-        })}
-      </MapView>
+              return (
+                  <MapView.Marker
+                      key={index}
+                      coordinate={markerCoords}
+                      title='My current location'
+                      //description={metaData}
+                  />
+              );
+            })}
+          </MapView>
+        </Content>
+      </Container>
+      
     );
   }
 }
@@ -83,11 +103,11 @@ export default class GeolocationScreen extends React.Component {
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
-    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center'
   },
-  content: {
-    color: '#fff'
+  mapView: {
+    height: 500,
+    width: '100%'
   }
 })

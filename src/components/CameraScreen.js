@@ -6,11 +6,11 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Slider,
   Platform
 } from 'react-native';
 import GalleryView from './GalleryView';
 import isIPhoneX from 'react-native-is-iphonex';
+import { Container } from 'native-base'; 
 
 import { 
   Ionicons,
@@ -19,6 +19,7 @@ import {
   MaterialCommunityIcons,
   Octicons
 } from '@expo/vector-icons';
+import Header from './Header';
 
 const landmarkSize = 2;
 
@@ -55,35 +56,32 @@ const wbIcons = {
 };
 
 export default class CameraScreen extends React.Component {
-
-  static navigationOptions = ({ navigation }) => {
-    return {
-      headerTitle: 'Camera'
-    }
-  }
-
-  state = {
-    flash: 'off',
-    zoom: 0,
-    autoFocus: 'on',
-    type: 'back',
-    whiteBalance: 'auto',
-    ratio: '16:9',
-    ratios: [],
-    barcodeScanning: false,
-    faceDetecting: false,
-    faces: [],
-    newPhotos: false,
-    permissionsGranted: false,
-    pictureSize: undefined,
-    pictureSizes: [],
-    pictureSizeId: 0,
-    showGallery: false,
-    showMoreOptions: false,
-    cameraIsRecording: false,
-    bcolor: 'white',
-    recordingIcon: 'ios-radio-button-on'
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      flash: 'off',
+      zoom: 0,
+      autoFocus: 'on',
+      type: 'back',
+      whiteBalance: 'auto',
+      ratio: '16:9',
+      ratios: [],
+      barcodeScanning: false,
+      faceDetecting: false,
+      faces: [],
+      newPhotos: false,
+      permissionsGranted: false,
+      pictureSize: undefined,
+      pictureSizes: [],
+      pictureSizeId: 0,
+      showGallery: false,
+      showMoreOptions: false,
+      cameraIsRecording: false,
+      bcolor: 'white',
+      recordingIcon: 'ios-radio-button-on',
+      headerProps: this.props.navigation
+    };
+  }  
 
   async componentWillMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -357,18 +355,25 @@ export default class CameraScreen extends React.Component {
     );
 
   render() {
+    const headerProps = this.state.headerProps;
     const cameraScreenContent = this.state.permissionsGranted
       ? this.renderCamera()
       : this.renderNoPermissions();
     const content = this.state.showGallery ? this.renderGallery() : cameraScreenContent;
-    return <View style={styles.container}>{content}</View>;
+    return (
+      <Container>
+        <Header {...headerProps}/>
+        <View style={styles.content}>{content}</View>
+      </Container>
+    )
+    
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#000'
   },
   camera: {
     flex: 1,
