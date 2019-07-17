@@ -25,7 +25,7 @@ const AppDrawerNavigator = createDrawerNavigator(
       }
     },
     contentOptions: {
-      activeTintColor: '#e91e63',
+      activeTintColor: '#039be5',
     },
   }
 )

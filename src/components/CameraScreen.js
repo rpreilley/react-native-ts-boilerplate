@@ -362,7 +362,7 @@ export default class CameraScreen extends React.Component {
     const content = this.state.showGallery ? this.renderGallery() : cameraScreenContent;
     return (
       <Container>
-        <Header {...headerProps}/>
+        <Header showBackButton={true} {...headerProps}/>
         <View style={styles.content}>{content}</View>
       </Container>
     )

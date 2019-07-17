@@ -13,25 +13,25 @@ export default class Home extends React.Component {
 
     return (
       <Container>
-        <Header {...headerProps}/>
+        <Header showBackButton={false} {...headerProps}/>
         <Content padder contentContainerStyle={styles.contentContainer}>
           <Text>
             This is a react native demonstration, utilizing Expo's camera and geolocation APIs.
           </Text>
         </Content>
-        <Footer>
+        <Footer style={styles.footer}>
           <FooterTab>
             <Button vertical onPress={() => this.props.navigation.navigate('Camera')}>
-              <Icon name="camera" />
-              <Text>Camera</Text>
+              <Icon name="camera" style={styles.footerButtons}/>
+              <Text style={styles.footerText}>Camera</Text>
             </Button>
             <Button vertical onPress={() => this.props.navigation.navigate('Video')}>
-              <Icon name="videocam" />
-              <Text>Video</Text>
+              <Icon name="videocam" style={styles.footerButtons}/>
+              <Text style={styles.footerText}>Video</Text>
             </Button>
             <Button vertical onPress={() => this.props.navigation.navigate('Geolocation')}>
-              <Icon active name="pin" />
-              <Text>Geolocation</Text>
+              <Icon active name="pin" style={styles.footerButtons}/>
+              <Text style={styles.footerText}>Geolocation</Text>
             </Button>
           </FooterTab>
         </Footer>
@@ -51,5 +51,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0
+  },
+  footer: {
+    backgroundColor: '#039be5',
+    textDecorationColor: '#f0f'
+  },
+  footerText: {
+    color: 'white'
+  },
+  footerButtons: {
+    color: 'white'
   }
 });
