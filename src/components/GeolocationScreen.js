@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { MapView, Location, Permissions } from "expo";
-import { Container, Content, Button, Text, Card, CardItem, Spinner  } from 'native-base'; 
+import { Container, Content, Button, Text, Card, CardItem, Spinner, Item, Input, Toast } from 'native-base'; 
 import Header from './Header';
 import API_KEYS from '../../constants';
 
@@ -16,7 +16,9 @@ export default class GeolocationScreen extends React.Component {
       nearbyRestaurants: [],
       currentLat: null,
       currentLon: null,
-      zomato_key: null
+      zomato_key: null,
+      zoomLevel: 2000,
+      adjustedZoomLevel: null
     }
   }
 
@@ -72,7 +74,7 @@ export default class GeolocationScreen extends React.Component {
   fetchRegionForCoordinates(lat, lon, distance) {
     const oneDegreeOfLatitudeInMeters = 111.32 * 1000;
 
-       const latitudeDelta =distance / oneDegreeOfLatitudeInMeters;
+       const latitudeDelta = distance / oneDegreeOfLatitudeInMeters;
        const longitudeDelta = distance / (oneDegreeOfLatitudeInMeters * Math.cos(lat * (Math.PI / 180)));
 
        return result = {
@@ -83,13 +85,33 @@ export default class GeolocationScreen extends React.Component {
        }
   }
 
+  changeZoomLevel() {
+    if (isNaN(this.state.adjustedZoomLevel) || (Number(this.state.adjustedZoomLevel) < 100)) {
+      Toast.show(
+        {
+          text: 'Must be a numeric value greater than 100', 
+          buttonText: 'Okay', 
+          duration: 3000,
+          position: 'top',
+          type: 'warning'
+        }
+      )
+    } else {
+      this.setState({ zoomLevel: Number(this.state.adjustedZoomLevel) })
+    }
+  }
+
+  _handleInputChange = (input) => {
+    this.setState({adjustedZoomLevel: input})
+  }
+
   render() {
     const navigationProps = this.props;
 
     const LATITUDE = this.state.currentLat; // Baton Rouge, LA
     const LONGITUDE = this.state.currentLon; // Baton Rouge, LA
 
-    let response = this.fetchRegionForCoordinates(LATITUDE, LONGITUDE, 2000);
+    let response = this.fetchRegionForCoordinates(LATITUDE, LONGITUDE, this.state.zoomLevel);
     
     // Set deltas based on response
     const LATITUDE_DELTA = response.latitudeDelta
@@ -110,6 +132,19 @@ export default class GeolocationScreen extends React.Component {
                 <Text>
                   {`Current Longitude: ${this.state.currentLon}`}
                 </Text> 
+              </CardItem>
+              <CardItem>
+                <Text>
+                  Toggle Zoom Level
+                </Text>
+                <Item>
+                  <Input style={{maxWidth: 150, marginRight: 50}} placeholder={this.state.zoomLevel.toString()} onChangeText={this._handleInputChange}/>
+                </Item>
+                <Button onPress={() => this.changeZoomLevel()}>
+                    <Text>
+                      Submit Zoom
+                    </Text>
+                  </Button> 
               </CardItem>
               <CardItem style={styles.restaurantButtons}>
                 <Button onPress={() => this.fetchNearbyRestaurants()}>
