@@ -87,9 +87,9 @@ export default class VideoScreen extends React.Component {
   }
 
   componentDidMount() {
-    FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'videos').catch(e => {
-      console.log(e, 'Directory exists');
-    });
+    // FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'videos').catch(e => {
+    //   console.log(e, 'Directory exists');
+    // });
   }
 
   getRatios = async () => {
@@ -370,7 +370,7 @@ export default class VideoScreen extends React.Component {
     const content = this.state.showGallery ? this.renderGallery() : cameraScreenContent;
     return (
       <Container>
-        <Header showBackButton={true} {...navigationProps} />
+        <Header showBackButton={true} {...navigationProps} title='Video' />
         <View style={styles.content}>{content}</View>
       </Container>
     )

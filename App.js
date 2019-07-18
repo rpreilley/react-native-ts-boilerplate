@@ -6,6 +6,7 @@ import GeolocationScreen from './src/components/GeolocationScreen';
 import AppOptionsScreen from './src/components/AppOptionsScreen';
 import Home from './src/components/Home';
 import { Root } from 'native-base';
+import { FileSystem } from 'expo';
 
 const AppDrawerNavigator = createDrawerNavigator(
   {
@@ -34,6 +35,17 @@ const AppDrawerNavigator = createDrawerNavigator(
 const AppContainer = createAppContainer(AppDrawerNavigator);
 
 export default class App extends React.Component {
+
+  componentDidMount() {
+    FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'photos').catch(e => {
+      console.log(e, 'Directory exists');
+    });
+
+    FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'videos').catch(e => {
+      console.log(e, 'Directory exists');
+    });
+  }
+
   static nagivationOptions = {
     title: 'App',
     headerTitle: 'Test'

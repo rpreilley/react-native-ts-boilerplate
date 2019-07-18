@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { MapView, Location, Permissions } from "expo";
-import { Container, Content, Button, Text, Card, CardItem, Body, Spinner  } from 'native-base'; 
+import { Container, Content, Button, Text, Card, CardItem, Spinner  } from 'native-base'; 
 import Header from './Header';
-import Footer from './Footer';
+import API_KEYS from '../../constants';
 
 export default class GeolocationScreen extends React.Component {
 
@@ -16,8 +16,7 @@ export default class GeolocationScreen extends React.Component {
       nearbyRestaurants: [],
       currentLat: null,
       currentLon: null,
-      brLatitude: 30.447407,
-      brLongitude: -91.181549
+      zomato_key: null
     }
   }
 
@@ -27,13 +26,13 @@ export default class GeolocationScreen extends React.Component {
   }
 
   componentDidMount() {
+    this.state.zomato_key = API_KEYS.ZOMATO
     this.fetchCurrentLocation();
   }
 
   fetchCurrentLocation() {
     Location.getCurrentPositionAsync()
       .then((response) => {
-        console.log(response)
         this.setState({
           isLoading: false,
           currentLocation: [response],
@@ -47,14 +46,27 @@ export default class GeolocationScreen extends React.Component {
   }
 
   fetchNearbyRestaurants() {
-    fetch(`https://developers.zomato.com/api/v2.1/geocode?lat=${this.state.currentLat}&lon=${this.state.currentLon}`)
-      .then(function(response) {
-        console.log("RESPONSE: ", response)
+    const config = {
+      headers: {
+        'user-key': this.state.zomato_key
+      }
+    }
+
+    fetch(`https://developers.zomato.com/api/v2.1/geocode?lat=${this.state.currentLat}&lon=${this.state.currentLon}`, config)
+      .then((response) => {
         return response.json();
       })
-      .then(function(myJson) {
-        console.log(JSON.stringify(myJson));
-      });
+      .then((myJson) => {
+        let response = myJson.nearby_restaurants;
+        this.setState({nearbyRestaurants: response})
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
+
+  clearNearbyRestaurants() {
+    this.setState({nearbyRestaurants: []})
   }
 
   fetchRegionForCoordinates(lat, lon, distance) {
@@ -74,10 +86,10 @@ export default class GeolocationScreen extends React.Component {
   render() {
     const navigationProps = this.props;
 
-    const LATITUDE = this.state.brLatitude; // Baton Rouge, LA
-    const LONGITUDE = this.state.brLongitude; // Baton Rouge, LA
+    const LATITUDE = this.state.currentLat; // Baton Rouge, LA
+    const LONGITUDE = this.state.currentLon; // Baton Rouge, LA
 
-    let response = this.fetchRegionForCoordinates(LATITUDE, LONGITUDE, 5000);
+    let response = this.fetchRegionForCoordinates(LATITUDE, LONGITUDE, 2000);
     
     // Set deltas based on response
     const LATITUDE_DELTA = response.latitudeDelta
@@ -85,10 +97,9 @@ export default class GeolocationScreen extends React.Component {
     
     return (
       <Container>
-        <Header showBackButton={true} {...navigationProps} />
-        <Content contentContainerStyle={styles.contentContainer}>
-          <View style={styles.topContent}>
-            { this.state.currentLat && this.state.currentLon ?
+        <Header showBackButton={true} {...navigationProps} title='Geolocation' />
+        <View style={styles.topContent}>
+          { this.state.currentLat && this.state.currentLon ?
             <Card>
               <CardItem>
                 <Text>
@@ -100,26 +111,30 @@ export default class GeolocationScreen extends React.Component {
                   {`Current Longitude: ${this.state.currentLon}`}
                 </Text> 
               </CardItem>
-              <CardItem style={{justifyContent: 'center'}}>
-                <Button onPress={() => this.fetchNearbyRestaurants}>
+              <CardItem style={styles.restaurantButtons}>
+                <Button onPress={() => this.fetchNearbyRestaurants()}>
                   <Text>
-                    Mark Nearby Restaurants
+                    Get Nearby Restaurants
                   </Text>
                 </Button>
-                { this.state.nearbyRestaurants.length > 0 ?
-                <Button>
+              </CardItem>
+              <CardItem>
+              { this.state.nearbyRestaurants.length > 0 ?
+                <Button onPress={() => this.clearNearbyRestaurants()}>
                   <Text>
                     Clear Restaurants Markers
                   </Text>
                 </Button>
-                : null
-                }
+              : null
+              }
               </CardItem>
-            </Card> : 
+            </Card> 
+            : 
             <Spinner color='#039be5' /> }
-          </View>
-          {}
-          <MapView
+        </View>
+        <Content contentContainerStyle={styles.contentContainer}>
+          { this.state.currentLat && this.state.currentLon ? 
+            <MapView
               style={styles.mapView}
               region={{
                 latitude: LATITUDE,
@@ -127,7 +142,7 @@ export default class GeolocationScreen extends React.Component {
                 latitudeDelta: LATITUDE_DELTA,
                 longitudeDelta: LONGITUDE_DELTA
               }}
-          >
+            >
             {this.state.isLoading ? null : this.state.currentLocation.map((marker, index) => {
 
               const markerCoords = {
@@ -135,19 +150,46 @@ export default class GeolocationScreen extends React.Component {
                 longitude: marker.coords.longitude,
               };
 
+              const metaData = `Lat: ${this.state.currentLat} Lon: ${this.state.currentLon}`
+
+              return (
+                  <MapView.Marker
+                      key='current-loc'
+                      coordinate={markerCoords}
+                      title='My current location'
+                      description={metaData}
+                      pinColor = '#039be5'
+                  />
+              );
+            })}
+
+            {this.state.isLoading ? null : this.state.nearbyRestaurants.map((marker, index) => {
+
+              // Lat Lon comes back as string, need to set as number before passing to component
+              let lat = Number(marker.restaurant.location.latitude);
+              let lon = Number(marker.restaurant.location.longitude);
+
+              const markerCoords = {
+                latitude: lat,
+                longitude: lon,
+              };
+
+              const metaData = `Address: ${marker.restaurant.location.address}`
+
               return (
                   <MapView.Marker
                       key={index}
                       coordinate={markerCoords}
-                      title='My current location'
-                      //description={metaData}
+                      title={marker.restaurant.name}
+                      description={metaData}
                   />
               );
             })}
-          </MapView>
+            </MapView>
+            : null
+          }
         </Content>
       </Container>
-      
     );
   }
 }
@@ -159,10 +201,14 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   topContent: {
+    marginTop: 10,
     marginBottom: 10
   },
   mapView: {
     height: 500,
     width: '100%'
+  },
+  restaurantButtons: {
+    
   }
 })

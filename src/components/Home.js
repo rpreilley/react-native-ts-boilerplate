@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  StyleSheet
+  StyleSheet,
+  Alert
 } from 'react-native';
 import { Container, Content, FooterTab, Button, Icon, Text } from 'native-base';
 import Header from './Header';
@@ -14,7 +15,7 @@ export default class Home extends React.Component {
 
     return (
       <Container>
-        <Header showBackButton={false} {...navigationProps}/>
+        <Header showBackButton={false} {...navigationProps} title='Home'/>
         <Content padder contentContainerStyle={styles.contentContainer}>
           <Text>
             This is a react native demonstration, utilizing Expo's camera and geolocation APIs.

@@ -89,9 +89,9 @@ export default class CameraScreen extends React.Component {
   }
 
   componentDidMount() {
-    FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'photos').catch(e => {
-      console.log(e, 'Directory exists');
-    });
+    // FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'photos').catch(e => {
+    //   console.log(e, 'Directory exists');
+    // });
   }
 
   getRatios = async () => {
@@ -273,7 +273,7 @@ export default class CameraScreen extends React.Component {
     <View
       style={styles.bottomBar}>
       <TouchableOpacity style={styles.bottomButton} onPress={this.toggleMoreOptions}>
-        <Octicons name="kebab-horizontal" size={30} color="white"/>
+        <Octicons name="kebab-vertical" size={30} color="white"/>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.bottomButton}
@@ -363,7 +363,7 @@ export default class CameraScreen extends React.Component {
     const content = this.state.showGallery ? this.renderGallery() : cameraScreenContent;
     return (
       <Container>
-        <Header showBackButton={true} {...navigationProps}/>
+        <Header showBackButton={true} {...navigationProps} title='Camera'/>
         <View style={styles.content}>{content}</View>
       </Container>
     )
