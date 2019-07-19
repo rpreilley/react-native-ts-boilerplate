@@ -27,6 +27,10 @@ export default class AppFooter extends Component {
             <Icon active name="pin" style={styles.footerButtons}/>
             <Text style={styles.footerText}>Geolocation</Text>
           </Button>
+          <Button vertical onPress={() => this.props.navigate('Settings')}>
+            <Icon active name="settings" style={styles.footerButtons}/>
+            <Text style={styles.footerText}>Settings</Text>
+          </Button>
         </FooterTab>
       </Footer>
     );

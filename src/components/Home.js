@@ -18,7 +18,7 @@ export default class Home extends React.Component {
         <Header showBackButton={false} {...navigationProps} title='Home'/>
         <Content padder contentContainerStyle={styles.contentContainer}>
           <Text>
-            This is a react native demonstration, utilizing Expo's camera and geolocation APIs.
+            This is a react native demonstration, utilizing camera and geolocation APIs from Expo.
           </Text>
         </Content>
         <Footer {...navigationProps} />

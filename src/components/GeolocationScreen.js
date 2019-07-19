@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { MapView, Location, Permissions } from "expo";
 import { Container, Content, Button, Text, Card, CardItem, Spinner, Item, Input, Toast } from 'native-base'; 
 import Header from './Header';
+import Slider from 'react-native-slider';
 import API_KEYS from '../../constants';
 
 export default class GeolocationScreen extends React.Component {
@@ -17,8 +18,7 @@ export default class GeolocationScreen extends React.Component {
       currentLat: null,
       currentLon: null,
       zomato_key: null,
-      zoomLevel: 2000,
-      adjustedZoomLevel: null
+      zoomLevel: 2000      
     }
   }
 
@@ -85,26 +85,6 @@ export default class GeolocationScreen extends React.Component {
        }
   }
 
-  changeZoomLevel() {
-    if (isNaN(this.state.adjustedZoomLevel) || (Number(this.state.adjustedZoomLevel) < 100)) {
-      Toast.show(
-        {
-          text: 'Must be a numeric value greater than 100', 
-          buttonText: 'Okay', 
-          duration: 3000,
-          position: 'top',
-          type: 'warning'
-        }
-      )
-    } else {
-      this.setState({ zoomLevel: Number(this.state.adjustedZoomLevel) })
-    }
-  }
-
-  _handleInputChange = (input) => {
-    this.setState({adjustedZoomLevel: input})
-  }
-
   render() {
     const navigationProps = this.props;
 
@@ -124,29 +104,23 @@ export default class GeolocationScreen extends React.Component {
           { this.state.currentLat && this.state.currentLon ?
             <Card>
               <CardItem>
-                <Text>
-                  {`Current Latitude: ${this.state.currentLat}`}
-                </Text> 
-              </CardItem>
-              <CardItem>
-                <Text>
-                  {`Current Longitude: ${this.state.currentLon}`}
-                </Text> 
-              </CardItem>
-              <CardItem>
-                <Text>
-                  Toggle Zoom Level
+                <Text style={styles.zoomText}>
+                 Adjust Zoom
                 </Text>
                 <Item>
-                  <Input style={{maxWidth: 150, marginRight: 50}} placeholder={this.state.zoomLevel.toString()} onChangeText={this._handleInputChange}/>
+                  <Slider
+                    value={this.state.zoomLevel}
+                    onValueChange = {(value) => this.setState({zoomLevel: value})}
+                    minimumValue = {1}
+                    maximumValue = {10000}
+                    thumbTintColor = '#039be5'
+                    minimumTrackTintColor= '#039be5'
+                    maximumTrackTintColor= '#039be5'
+                    style={{width: 500}}
+                  />
                 </Item>
-                <Button onPress={() => this.changeZoomLevel()}>
-                    <Text>
-                      Submit Zoom
-                    </Text>
-                  </Button> 
               </CardItem>
-              <CardItem style={styles.restaurantButtons}>
+              <CardItem>
                 <Button onPress={() => this.fetchNearbyRestaurants()}>
                   <Text>
                     Get Nearby Restaurants
@@ -243,7 +217,7 @@ const styles = StyleSheet.create({
     height: 500,
     width: '100%'
   },
-  restaurantButtons: {
-    
+  zoomText: {
+    marginRight: 5
   }
 })
